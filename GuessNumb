@@ -1,0 +1,934 @@
+import javax.swing.*;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.PlainDocument;
+
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
+/**
+ * @author Mageluer
+ *
+ */
+public class GuessNumb {
+	private static final int WIDTH=865;
+	private static final int HEIGHT=520;
+	private static JFrame mainframe=null;
+	private static Point originpoint=null;
+	private static JPanel pane=null;
+	private static CardLayout card=null;
+	private InitialPanel initialpanel=null;
+	private TransitPanel transitpanel=null;
+	private MainMenuPanel mainmenupanel=null;
+	private GamePanel gamepanel=null;
+
+	public GuessNumb(){
+		mainframe=new JFrame("Guess Number");
+		pane=new JPanel();
+		card=new CardLayout(0,0);
+		pane.setLayout(card);
+		initialpanel=new InitialPanel();
+		transitpanel=new TransitPanel();
+		mainmenupanel=new MainMenuPanel();
+		gamepanel=new GamePanel();
+		
+		
+		pane.add(initialpanel, "initialpanel");
+		pane.add(transitpanel,"transitpanel");
+		pane.add(mainmenupanel,"mainmenupanel");
+		pane.add(gamepanel,"gamepanel");
+		
+		
+		
+		
+		
+		
+
+		mainframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		mainframe.setPreferredSize(new Dimension(WIDTH,HEIGHT));
+		Toolkit kit=Toolkit.getDefaultToolkit();
+		Dimension screensize=kit.getScreenSize();
+		int width=screensize.width;
+		int height=screensize.height;
+		mainframe.setLocation((width-WIDTH)/2, (height-HEIGHT)/2);
+		Image iconimage=kit.getImage("icon4.jpg");
+		mainframe.setIconImage(iconimage);
+		mainframe.setContentPane(pane);
+		mainframe.setUndecorated(true);
+		
+		mainframe.addMouseListener(new MouseAdapter(){
+			public void mousePressed(MouseEvent e){
+				originpoint=e.getPoint();
+			}
+		});
+		mainframe.addMouseMotionListener(new MouseMotionAdapter(){
+			public void mouseDragged(MouseEvent e){
+				Point p=mainframe.getLocation();
+				mainframe.setLocation(p.x+e.getX()-originpoint.x, p.y+e.getY()-originpoint.y);
+			}
+		});
+
+	
+		
+		mainframe.setVisible(true);		
+		mainframe.pack();
+	}
+
+		
+	
+	
+
+	
+	
+	public static void cardshow(String panel){
+		card.show(pane, panel);
+	}
+
+
+	public static void minimumframe(){
+		mainframe.setExtendedState(JFrame.ICONIFIED);
+	}
+	
+	public static void main(String[] args){
+		new GuessNumb();
+	}
+}
+
+/**
+ * 
+ * 启动器界面
+ *没什么别的意思
+ *
+ */
+class InitialPanel extends JPanel{
+	private String path;
+	private JButton startgamebutton=null,
+			updatebutton=null,
+			setbutton=null,
+			closebutton=null,
+			minibutton=null;
+	private GridBagLayout gblay=null;
+	private GridBagConstraints constraints=null;
+	public InitialPanel() {
+		path="initial background"+"/"+((int)(Math.random()*14)+1)+".jpg";
+		this.path=path;
+		gblay=new GridBagLayout();
+		constraints=new GridBagConstraints();
+		constraints.anchor=GridBagConstraints.CENTER;
+		constraints.fill=GridBagConstraints.BOTH;
+		startgamebutton=new JButton("Start Game");
+		updatebutton=new JButton("Update");
+		setbutton=new JButton("Set");
+		minibutton=new JButton(new ImageIcon(new ImageIcon("minibutton.png").getImage().getScaledInstance(24,16, Image.SCALE_DEFAULT)));
+		closebutton=new JButton(new ImageIcon(new ImageIcon("closebutton3.png").getImage().getScaledInstance(24,16, Image.SCALE_DEFAULT)));
+		
+		this.setLayout(gblay);
+		
+		closebutton.setOpaque(false);
+		closebutton.setBackground(new Color(220,220,250));
+		closebutton.setFocusPainted(false);
+		closebutton.setBorder(null);
+		closebutton.addMouseListener(new MouseAdapter(){
+		   public void mouseEntered(MouseEvent e)
+		   {
+		    JButton eventBtn = (JButton) e.getSource();
+		    eventBtn.setOpaque(true);
+		    eventBtn.setBackground(new Color(220,70,70));
+		   }
+		   public void mouseExited(MouseEvent e)
+		   {
+		    JButton eventBtn = (JButton) e.getSource();
+		    eventBtn.setOpaque(false);
+		   }
+		});
+		minibutton.setOpaque(false);
+		minibutton.setBackground(new Color(50,40,255));
+		minibutton.setFocusPainted(false);
+		minibutton.setBorder(null);
+		minibutton.addMouseListener(new MouseAdapter(){
+			   public void mouseEntered(MouseEvent e)
+			   {
+			    JButton eventBtn = (JButton) e.getSource();
+			    eventBtn.setOpaque(true);
+			    eventBtn.setBackground(new Color(150,200,200));
+			   }
+			   public void mouseExited(MouseEvent e)
+			   {
+			    JButton eventBtn = (JButton) e.getSource();
+			    eventBtn.setOpaque(false);
+			   }
+			});
+		startgamebutton.setBackground(new Color(220,220,250));
+		startgamebutton.setFocusPainted(false);
+		startgamebutton.setForeground(new Color(46,46,36));	
+		startgamebutton.setFont(new Font("",Font.BOLD,25));
+		startgamebutton.setBorder(null);
+		startgamebutton.addMouseListener(new MouseMoveHandle());
+		updatebutton.setBackground(new Color(210,210,250));
+		updatebutton.setFocusPainted(false);
+		updatebutton.setForeground(new Color(46,46,36));		
+		updatebutton.setBorder(null);
+		updatebutton.addMouseListener(new MouseMoveHandle());
+		setbutton.setBackground(new Color(210,210,250));
+		setbutton.setFocusPainted(false);
+		setbutton.setForeground(new Color(46,46,36));		
+		setbutton.setBorder(null);
+		setbutton.addMouseListener(new MouseMoveHandle());
+		
+		minibutton.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent ae){
+				GuessNumb.minimumframe();
+			}
+		});
+		closebutton.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent ae){
+				System.exit(0);
+			}
+		});
+		startgamebutton.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent ae){
+				GuessNumb.cardshow("transitpanel");
+				
+			}
+		});
+		updatebutton.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent ae){
+				
+			}
+		});
+		setbutton.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent ae){
+				
+			}
+		});
+		  
+		constraints.insets=new Insets(0,0,10,0);
+		add(minibutton,constraints,1,1,3,0,1,1);
+		constraints.insets=new Insets(0,1,10,0);
+		add(closebutton,constraints,1,1,4,0,1,1);
+		constraints.insets=new Insets(380,550,15,5);
+		add(startgamebutton,constraints,20,50,1,1,1,2);
+		constraints.insets=new Insets(380,5,5,-45);
+		add(updatebutton,constraints,15,15,2,1,1,1);
+		constraints.insets=new Insets(5,5,15,-45);
+		add(setbutton,constraints,15,15,2,2,1,1);
+	}
+	
+	public void paintComponent(Graphics g) {
+	   int x = 0, y = 0;
+	   ImageIcon icon = new ImageIcon(path);
+	   g.drawImage(icon.getImage(), x, y, getSize().width,
+	     getSize().height, this);
+	   g.setColor(Color.WHITE);;
+	   g.drawString("GuessNumber  Launcher  1.00  by  空肠得酒", 5, 500);
+	   
+	}
+	
+	public void add(Component c,GridBagConstraints constraints,double wx,double wy, int x,int y,int w,int h){
+		constraints.weightx=wx;
+		constraints.weighty=wy;
+		constraints.gridx=x;
+		constraints.gridy=y;
+		constraints.gridwidth=w;
+		constraints.gridheight=h;
+		gblay.setConstraints(c, constraints); 
+		this.add(c);
+	}
+	class MouseMoveHandle extends MouseAdapter{
+		   public void mouseEntered(MouseEvent e)
+		   {
+		    JButton eventBtn = (JButton) e.getSource();
+		    eventBtn.setOpaque(false);
+		    eventBtn.setBorder(BorderFactory.createLineBorder(new Color(46,46,36)));
+		    super.mouseEntered(e);
+		   }
+		   public void mouseExited(MouseEvent e)
+		   {
+		    JButton eventBtn = (JButton) e.getSource();
+		    eventBtn.setOpaque(true);
+		    eventBtn.setBorder(null);
+		    super.mouseExited(e);
+		   }
+	}
+	
+
+}
+
+
+/**
+ * 
+ * 过渡画面而已
+ *
+ */
+class TransitPanel extends JPanel{
+   	  private GridBagLayout gridbaglay;
+	  private GridBagConstraints constraints;
+	  private JLabel jlb;
+	  private String path;
+	  public TransitPanel() {
+		  gridbaglay=new GridBagLayout();
+		  constraints=new GridBagConstraints();
+		  constraints.insets=new Insets(475,700,10,20);
+		  jlb=new JLabel("move your mouse to continue");
+		  
+		  setLayout(gridbaglay);
+		  gridbaglay.setConstraints(jlb, constraints); 
+		  add(jlb);
+		  jlb.setForeground(new Color(180,200,200));
+		  jlb.setVisible(true);
+		  path="transitbackground.jpg";
+		  addMouseMotionListener(new MouseAdapter(){
+			  public void mouseMoved(MouseEvent e){
+				  if(jlb.isVisible()){
+					  jlb.setVisible(false);
+					  
+				  }
+				  else{
+					  try {
+						  Thread.sleep(1000);
+					  } catch (InterruptedException e1) {
+						  e1.printStackTrace();
+					  }			  
+					  GuessNumb.cardshow("mainmenupanel");
+				  }
+			  }
+		  });
+		  
+	  }
+
+	  public void paintComponent(Graphics g) {
+	   int x = 0, y = 0;
+	   ImageIcon icon = new ImageIcon(path);
+	   g.drawImage(icon.getImage(), x, y, getSize().width,
+	     getSize().height, this);
+
+	  }
+	
+}
+
+class MainMenuPanel extends JPanel{
+	private String path;
+	private GridBagLayout gridbaglay;
+	private GridBagConstraints constraints;
+	private NewLabel nlb1;
+	private JButton jbt1,jbt2,jbt3,jbt4,jbt5,jbt6,
+			closebutton=null,
+			minibutton=null;
+	public MainMenuPanel(){
+		gridbaglay=new GridBagLayout();
+		constraints=new GridBagConstraints();
+		nlb1=new NewLabel("GuessNumber.png");
+		jbt1=new JButton("Start");
+		jbt2=new JButton("Exit");
+		jbt3=new JButton("History");
+		jbt4=new JButton("Set");
+		jbt5=new JButton("Help");
+		jbt6=new JButton(new ImageIcon(new ImageIcon("diamond2.png").getImage().getScaledInstance(20,20, Image.SCALE_DEFAULT)));
+		minibutton=new JButton(new ImageIcon(new ImageIcon("minibutton.png").getImage().getScaledInstance(24,16, Image.SCALE_DEFAULT)));
+		closebutton=new JButton(new ImageIcon(new ImageIcon("closebutton3.png").getImage().getScaledInstance(24,16, Image.SCALE_DEFAULT)));
+		path="backgroundfinal.gif";
+		
+		setLayout(gridbaglay);
+		setBorder(BorderFactory.createLineBorder(Color.BLACK));
+		
+		constraints.anchor=GridBagConstraints.CENTER;
+		constraints.fill=GridBagConstraints.BOTH;
+		
+		closebutton.setOpaque(false);
+		closebutton.setBackground(new Color(220,220,250));
+		closebutton.setFocusPainted(false);
+		closebutton.setBorder(null);
+		closebutton.addMouseListener(new MouseAdapter(){
+		   public void mouseEntered(MouseEvent e)
+		   {
+		    JButton eventBtn = (JButton) e.getSource();
+		    eventBtn.setOpaque(true);
+		    eventBtn.setBackground(new Color(220,70,70));
+		   }
+		   public void mouseExited(MouseEvent e)
+		   {
+		    JButton eventBtn = (JButton) e.getSource();
+		    eventBtn.setOpaque(false);
+		   }
+		});
+		closebutton.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent ae){
+				System.exit(0);
+			}
+		});
+		minibutton.setOpaque(false);
+		minibutton.setBackground(new Color(50,40,255));
+		minibutton.setFocusPainted(false);
+		minibutton.setBorder(null);
+		minibutton.addMouseListener(new MouseAdapter(){
+			   public void mouseEntered(MouseEvent e)
+			   {
+			    JButton eventBtn = (JButton) e.getSource();
+			    eventBtn.setOpaque(true);
+			    eventBtn.setBackground(new Color(150,200,200));
+			   }
+			   public void mouseExited(MouseEvent e)
+			   {
+			    JButton eventBtn = (JButton) e.getSource();
+			    eventBtn.setOpaque(false);
+			   }
+			});
+		minibutton.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent ae){
+				GuessNumb.minimumframe();
+			}
+		});
+		jbt1.setBackground(Color.GRAY.darker());
+		jbt1.setFocusPainted(false);
+		jbt1.setForeground(Color.WHITE);		
+		jbt1.setBorder(BorderFactory.createRaisedBevelBorder());
+		jbt1.addMouseListener(new MouseMoveHandle());
+		jbt1.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e){
+				GuessNumb.cardshow("gamepanel");
+			}
+
+		});
+		jbt2.setBackground(Color.GRAY.darker());
+		jbt2.setFocusPainted(false);
+		jbt2.setForeground(Color.WHITE);
+		jbt2.setBorder(BorderFactory.createRaisedBevelBorder());
+		jbt2.addMouseListener(new MouseMoveHandle());
+		jbt2.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e){
+				System.exit(0);
+			}
+
+		});
+		jbt3.setBackground(Color.GRAY.darker());
+		jbt3.setFocusPainted(false);
+		jbt3.setForeground(Color.WHITE);
+		jbt3.setBorder(BorderFactory.createRaisedBevelBorder());
+		jbt3.addMouseListener(new MouseMoveHandle());
+		jbt3.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e){
+				System.exit(0);
+			}
+
+		});
+		jbt4.setBackground(Color.GRAY.darker());
+		jbt4.setFocusPainted(false);
+		jbt4.setForeground(Color.WHITE);
+		jbt4.setBorder(BorderFactory.createRaisedBevelBorder());
+		jbt4.addMouseListener(new MouseMoveHandle());
+		jbt4.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e){
+				System.exit(0);
+			}
+
+		});
+		jbt5.setBackground(Color.GRAY.darker());
+		jbt5.setFocusPainted(false);
+		jbt5.setForeground(Color.WHITE);
+		jbt5.setBorder(BorderFactory.createRaisedBevelBorder());
+		jbt5.addMouseListener(new MouseMoveHandle());
+		jbt5.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e){
+				System.exit(0);
+			}
+
+		});
+		jbt6.setBackground(Color.GRAY.darker());
+		jbt6.setFocusPainted(false);
+		jbt6.setForeground(Color.WHITE);
+		jbt6.setBorder(BorderFactory.createRaisedBevelBorder());
+		jbt6.addMouseListener(new MouseMoveHandle());
+		jbt6.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e){
+				System.exit(0);
+			}
+
+		});
+		
+		constraints.insets=new Insets(-1,0,10,0);
+		add(minibutton,constraints,1,1,4,0,1,1);
+		constraints.insets=new Insets(-1,1,10,0);
+		add(closebutton,constraints,1,1,5,0,1,1);
+		constraints.insets=new Insets(50,75,30,65);
+		add(nlb1,constraints,70,80,1,1,5,1);
+		constraints.insets=new Insets(45,5,6,170);
+		add(jbt1,constraints,60,13,2,2,2,1);
+		constraints.insets=new Insets(6,5,6,170);
+		add(jbt2,constraints,60,13,2,3,2,1);
+		add(jbt3,constraints,60,13,2,4,2,1);
+		constraints.insets=new Insets(25,185,50,10);
+		add(jbt6,constraints,3.5,13,1,5,1,1);
+		constraints.insets=new Insets(25,5,50,5);
+		add(jbt4,constraints,30,13,2,5,1,1);
+		constraints.insets=new Insets(25,5,50,170);
+		add(jbt5,constraints,30,13,3,5,1,1);
+	}
+	
+	public void add(Component c,GridBagConstraints constraints,double wx,double wy, int x,int y,int w,int h){
+		constraints.weightx=wx;
+		constraints.weighty=wy;
+		constraints.gridx=x;
+		constraints.gridy=y;
+		constraints.gridwidth=w;
+		constraints.gridheight=h;
+		gridbaglay.setConstraints(c, constraints); 
+		add(c);
+	}
+	
+	public void paintComponent(Graphics g) {
+		   int x = 0, y = 0;
+		   ImageIcon icon = new ImageIcon(path);
+		   g.drawImage(icon.getImage(), x, y, getSize().width,
+		     getSize().height, this);
+	}
+	
+	class MouseMoveHandle extends MouseAdapter{
+		   public void mouseEntered(MouseEvent e)
+		   {
+		    JButton eventBtn = (JButton) e.getSource();
+		    eventBtn.setBackground(new Color(100,100,200));
+		    super.mouseEntered(e);
+		   }
+		   public void mouseExited(MouseEvent e)
+		   {
+		    JButton eventBtn = (JButton) e.getSource();
+		    eventBtn.setBackground(Color.GRAY.darker());
+		    super.mouseExited(e);
+		   }
+	}
+	
+	class NewLabel extends JLabel{
+		private String path;
+		public NewLabel(String path){
+			this.path=path;
+		}
+		public void paintComponent(Graphics g){
+			int x=0,y=0;
+			ImageIcon icon = new ImageIcon(path);
+			g.drawImage(icon.getImage(), x, y, getSize().width,
+		     getSize().height, this);			
+		}
+	}
+}
+/*
+ * 游戏面板
+ * 由三部分组成
+ */
+class GamePanel extends JPanel{
+	private String path=null;
+	private GridBagLayout gridbaglay;
+	private GridBagConstraints constraints;
+	private JButton closebutton=null,
+			minibutton=null;
+	private LeftPanel leftpanel=null;
+	private CenterPanel centerpanel=null;
+	private RightPanel rightpanel=null;
+	private JLabel leftlabel=null,
+			rightlabel=null;
+	public GamePanel(){
+		gridbaglay=new GridBagLayout();
+		constraints=new GridBagConstraints();
+		minibutton=new JButton(new ImageIcon(new ImageIcon("minibutton.png").getImage().getScaledInstance(24,16, Image.SCALE_DEFAULT)));
+		closebutton=new JButton(new ImageIcon(new ImageIcon("closebutton3.png").getImage().getScaledInstance(24,16, Image.SCALE_DEFAULT)));
+		leftpanel=new LeftPanel();
+		centerpanel=new CenterPanel();
+		rightpanel=new RightPanel();
+		leftlabel=new JLabel(" ");
+		rightlabel=new JLabel(" ");
+		path="gamebackground/4.jpg";
+		
+		setLayout(gridbaglay);
+		
+		constraints.anchor=GridBagConstraints.CENTER;
+		constraints.fill=GridBagConstraints.BOTH;
+		
+		/*
+		 * 对关闭和最小化按钮的设置
+		 */
+		closebutton.setOpaque(false);
+		closebutton.setBackground(new Color(220,220,250));
+		closebutton.setFocusPainted(false);
+		closebutton.setBorder(null);
+		closebutton.addMouseListener(new MouseAdapter(){
+		   public void mouseEntered(MouseEvent e)
+		   {
+		    JButton eventBtn = (JButton) e.getSource();
+		    eventBtn.setOpaque(true);
+		    eventBtn.setBackground(new Color(220,70,70));
+		   }
+		   public void mouseExited(MouseEvent e)
+		   {
+		    JButton eventBtn = (JButton) e.getSource();
+		    eventBtn.setOpaque(false);
+		   }
+		});
+		minibutton.setOpaque(false);
+		minibutton.setBackground(new Color(50,40,255));
+		minibutton.setFocusPainted(false);
+		minibutton.setBorder(null);
+		minibutton.addMouseListener(new MouseAdapter(){
+			   public void mouseEntered(MouseEvent e)
+			   {
+			    JButton eventBtn = (JButton) e.getSource();
+			    eventBtn.setOpaque(true);
+			    eventBtn.setBackground(new Color(150,200,200));
+			   }
+			   public void mouseExited(MouseEvent e)
+			   {
+			    JButton eventBtn = (JButton) e.getSource();
+			    eventBtn.setOpaque(false);
+			   }
+			});
+		minibutton.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent ae){
+				GuessNumb.minimumframe();
+			}
+		});
+		closebutton.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent ae){
+				System.exit(0);
+			}
+		});
+		
+		leftlabel.addMouseListener(new MouseAdapter(){
+			public void mouseEntered(MouseEvent e)
+			   {
+			    leftpanel.setVisible(true);
+			    leftlabel.setVisible(false);
+			    rightpanel.setVisible(false);
+			   }
+		});
+		rightlabel.addMouseListener(new MouseAdapter(){
+			public void mouseEntered(MouseEvent e)
+			   {
+			    rightpanel.setVisible(true);
+			    rightlabel.setVisible(false);
+			    leftpanel.setVisible(false);
+			    minibutton.setVisible(false);
+			    closebutton.setVisible(false);
+			   }
+		});
+		
+		constraints.insets=new Insets(-1,0,0,0);
+		add(minibutton,constraints,1,1,3,1,1,1);
+		constraints.insets=new Insets(-1,1,0,0);
+		add(closebutton,constraints,1,1,4,1,1,1);
+		constraints.insets=new Insets(0,0,0,0);
+		add(leftlabel,constraints,1,1,1,1,1,2);
+		constraints.insets=new Insets(20,0,0,0);
+		add(rightlabel,constraints,1,200,3,2,2,1);
+		constraints.insets=new Insets(0,0,0,0);
+		add(leftpanel,constraints,40,1,1,1,1,2);
+		constraints.insets=new Insets(0,0,0,0);
+		add(centerpanel,constraints,20,1,2,1,1,2);
+		constraints.insets=new Insets(0,0,0,0);
+		add(rightpanel,constraints,600,1,3,1,2,2);
+	}
+	
+	public void add(Component c,GridBagConstraints constraints,double wx,double wy, int x,int y,int w,int h){
+		constraints.weightx=wx;
+		constraints.weighty=wy;
+		constraints.gridx=x;
+		constraints.gridy=y;
+		constraints.gridwidth=w;
+		constraints.gridheight=h;
+		gridbaglay.setConstraints(c, constraints); 
+		add(c);
+	}
+	
+	public void paintComponent(Graphics g) {
+		   int x = 0, y = 0;
+		   ImageIcon icon = new ImageIcon(path);
+		   g.drawImage(icon.getImage(), x, y, getSize().width,
+		     getSize().height, this);
+	}
+	
+	
+	/*
+	 * 左面板
+	 */
+	class LeftPanel extends JPanel{
+		private String path=null;
+		private GridBagLayout gridbaglay;
+		private GridBagConstraints constraints;
+		private JButton jbt1,
+			jbt2,
+			jbt3,
+			jbt4,
+			jbt5;
+		
+		public LeftPanel(){
+			gridbaglay=new GridBagLayout();
+			constraints=new GridBagConstraints();
+			jbt1=new JButton("I am ready");
+			jbt2=new JButton("34");
+			jbt3=new JButton("I am ready");
+			jbt4=new JButton("I am 34ady");
+			jbt5=new JButton("I am ready");
+			path="gamebackground/Douflamingo.png";
+			
+			setLayout(gridbaglay);
+			
+			constraints.anchor=GridBagConstraints.CENTER;
+			constraints.fill=GridBagConstraints.BOTH;
+			
+			constraints.insets=new Insets(100,40,2,40);
+			add(jbt1,constraints,1,1,1,1,2,1);
+			constraints.insets=new Insets(2,40,2,2);
+			add(jbt2,constraints,1,1,1,2,1,1);
+			constraints.insets=new Insets(2,2,2,40);
+			add(jbt3,constraints,1,1,2,2,1,1);
+			constraints.insets=new Insets(2,40,2,40);
+			add(jbt4,constraints,1,1,1,3,2,1);
+			constraints.insets=new Insets(2,40,20,40);
+			add(jbt5,constraints,1,1,1,4,2,1);
+			
+			
+			jbt1.setBackground(Color.GRAY.darker());
+			jbt1.setFocusPainted(false);
+			jbt1.setForeground(Color.WHITE);		
+			jbt1.setBorder(BorderFactory.createRaisedBevelBorder());
+			jbt1.addMouseListener(new MouseMoveHandle());
+			jbt1.addActionListener(new ActionListener(){
+				public void actionPerformed(ActionEvent e){
+					System.exit(0);
+				}
+
+			});
+			jbt2.setBackground(Color.GRAY.darker());
+			jbt2.setFocusPainted(false);
+			jbt2.setForeground(Color.WHITE);
+			jbt2.setBorder(BorderFactory.createRaisedBevelBorder());
+			jbt2.addMouseListener(new MouseMoveHandle());
+			jbt2.addActionListener(new ActionListener(){
+				public void actionPerformed(ActionEvent e){
+					System.exit(0);
+				}
+
+			});
+			jbt3.setBackground(Color.GRAY.darker());
+			jbt3.setFocusPainted(false);
+			jbt3.setForeground(Color.WHITE);
+			jbt3.setBorder(BorderFactory.createRaisedBevelBorder());
+			jbt3.addMouseListener(new MouseMoveHandle());
+			jbt3.addActionListener(new ActionListener(){
+				public void actionPerformed(ActionEvent e){
+					System.exit(0);
+				}
+
+			});
+			jbt4.setBackground(Color.GRAY.darker());
+			jbt4.setFocusPainted(false);
+			jbt4.setForeground(Color.WHITE);
+			jbt4.setBorder(BorderFactory.createRaisedBevelBorder());
+			jbt4.addMouseListener(new MouseMoveHandle());
+			jbt4.addActionListener(new ActionListener(){
+				public void actionPerformed(ActionEvent e){
+					System.exit(0);
+				}
+
+			});
+			jbt5.setBackground(Color.GRAY.darker());
+			jbt5.setFocusPainted(false);
+			jbt5.setForeground(Color.WHITE);
+			jbt5.setBorder(BorderFactory.createRaisedBevelBorder());
+			jbt5.addMouseListener(new MouseMoveHandle());
+			jbt5.addActionListener(new ActionListener(){
+				public void actionPerformed(ActionEvent e){
+					System.exit(0);
+				}
+
+			});
+		}
+		
+		public void add(Component c,GridBagConstraints constraints,double wx,double wy, int x,int y,int w,int h){
+			constraints.weightx=wx;
+			constraints.weighty=wy;
+			constraints.gridx=x;
+			constraints.gridy=y;
+			constraints.gridwidth=w;
+			constraints.gridheight=h;
+			gridbaglay.setConstraints(c, constraints); 
+			add(c);
+		}
+		
+		public void paintComponent(Graphics g) {
+			   int x = 0, y = 0;
+			   ImageIcon icon = new ImageIcon(path);
+			   g.drawImage(icon.getImage(), x, y, getSize().width,
+			     getSize().height, this);
+		}
+		
+		class MouseMoveHandle extends MouseAdapter{
+			   public void mouseEntered(MouseEvent e)
+			   {
+			    JButton eventBtn = (JButton) e.getSource();
+			    eventBtn.setBackground(new Color(100,100,200));
+			    super.mouseEntered(e);
+			   }
+			   public void mouseExited(MouseEvent e)
+			   {
+			    JButton eventBtn = (JButton) e.getSource();
+			    eventBtn.setBackground(Color.GRAY.darker());
+			    super.mouseExited(e);
+			   }
+		}
+	}
+	
+	class CenterPanel extends JPanel{
+		private static final int WIDTH=200,
+				HEIGHT=520;
+		private String path=null;
+		private GridBagLayout gridbaglay;
+		private GridBagConstraints constraints;
+		private JLabel tiplabel=null,
+				infolabel=null;
+		private JPanel buttonpane=null,
+				answerpane=null;
+		private JButton[] numbutton=null;
+		private JTextField[] answer=null;
+		public CenterPanel(){
+			gridbaglay=new GridBagLayout();
+			constraints=new GridBagConstraints();
+			tiplabel=new JLabel("yfuyf",JLabel.CENTER);
+			infolabel=new JLabel("fffuyf",JLabel.CENTER);
+			buttonpane=new JPanel(new GridLayout(4,3,1,1));
+			answerpane=new JPanel(new GridLayout(1,10,1,1));
+			numbutton=new JButton[12];
+			answer=new JTextField[10];
+			path="gamebackground/transparent.png";
+			
+			for(int i=0;i<12;i++){
+				if(i<10)
+					numbutton[i]=new JButton(String.valueOf(9-i));
+				else if(i==10)
+					numbutton[i]=new JButton("Delete");
+				else
+					numbutton[i]=new JButton("Enter");
+				numbutton[i].setBackground(new Color(62,188,202));
+				numbutton[i].setFocusPainted(false);
+				numbutton[i].setForeground(new Color(255,255,255));		
+				numbutton[i].setBorder(null);
+				buttonpane.add(numbutton[i]);
+			}
+			buttonpane.setBackground(new Color(191,174,166));
+			for(int i=0;i<10;i++){
+				answer[i]=new JTextField();
+				answer[i].setDocument(new NumberLenghtLimitedDmt(1));
+				answer[i].setBorder(BorderFactory.createEmptyBorder());
+				answer[i].setBackground(new Color(203,203,203));
+				answerpane.add(answer[i]);
+			}
+			answerpane.setBackground(null);
+			tiplabel.setOpaque(true);
+			tiplabel.setBackground(new Color(36,169,255));
+			infolabel.setOpaque(true);
+			infolabel.setBackground(new Color(151,151,151));
+			
+			setLayout(gridbaglay);
+			constraints.anchor=GridBagConstraints.CENTER;
+			constraints.fill=GridBagConstraints.BOTH;
+			
+			
+			constraints.insets=new Insets(50,220,0,220);
+			add(tiplabel,constraints,40,30,1,1,1,1);
+			constraints.insets=new Insets(10,220,0,220);
+			add(answerpane,constraints,40,30,1,2,1,1);
+			constraints.insets=new Insets(10,220,0,220);
+			add(buttonpane,constraints,40,60,1,3,1,1);
+			constraints.insets=new Insets(10,220,150,220);
+			add(infolabel,constraints,40,30,1,4,1,1);
+			addMouseListener(new MouseAdapter(){
+				public void mouseEntered(MouseEvent e)
+				   {
+				    leftpanel.setVisible(false);
+				    rightpanel.setVisible(false);
+				    leftlabel.setVisible(true);
+				    rightlabel.setVisible(true);
+				    minibutton.setVisible(true);
+				    closebutton.setVisible(true);
+				   }
+			});
+			
+		}
+		
+		public void add(Component c,GridBagConstraints constraints,double wx,double wy, int x,int y,int w,int h){
+			constraints.weightx=wx;
+			constraints.weighty=wy;
+			constraints.gridx=x;
+			constraints.gridy=y;
+			constraints.gridwidth=w;
+			constraints.gridheight=h;
+			gridbaglay.setConstraints(c, constraints); 
+			add(c);
+		}
+		
+		public void paintComponent(Graphics g) {
+			   int x = 0, y = 0;
+			   ImageIcon icon = new ImageIcon(path);
+			   g.drawImage(icon.getImage(), x, y, getSize().width,
+			     getSize().height, this);
+		}
+		
+		class NumberLenghtLimitedDmt extends PlainDocument {
+			 
+			   private int limit; 
+			   public NumberLenghtLimitedDmt(int limit) {
+			    super();
+			       this.limit = limit;
+			    }  
+			   public void insertString
+			     (int offset, String  str, AttributeSet attr)
+			                                   throws BadLocationException {   
+			       if (str == null){
+			        return;
+			       }
+			       if ((getLength() + str.length()) <= limit) {
+			       
+			       char[] upper = str.toCharArray();
+			       int length=0;
+			       for (int i = 0; i < upper.length; i++) {       
+			           if (upper[i]>='0'&&upper[i]<='9'){           
+			              upper[length++] = upper[i];
+			           }
+			       }
+			         super.insertString(offset, new String(upper,0,length), attr);
+			      }
+			    }
+			}
+		
+	}
+	
+	/*
+	 * 右面板
+	 */
+	class RightPanel extends JPanel{
+		private String path=null;
+		private JTextArea record=null;
+		private JScrollPane scrollpane=null;
+		public RightPanel(){
+			record=new JTextArea("rerertrrtrere");
+			scrollpane=new JScrollPane(record);
+			scrollpane.setBorder(null);
+			scrollpane.setPreferredSize(new Dimension(200,520));
+			path="gamebackground/Douflamingo.png";
+			
+			
+			this.add(scrollpane);
+			
+			
+		}
+		
+		public void paintComponent(Graphics g) {
+			   int x = 0, y = 0;
+			   ImageIcon icon = new ImageIcon(path);
+			   g.drawImage(icon.getImage(), x, y, getSize().width,
+			     getSize().height, this);
+		}
+		
+	}
+	
+}
